@@ -3,6 +3,25 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+async function uploadRecipeImage(
+  supabase: SupabaseClient,
+  userId: string,
+  file: File
+): Promise<string | null> {
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const fileName = `${userId}/${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("recipe-images")
+    .upload(fileName, file, { contentType: file.type, upsert: false });
+
+  if (error) return null;
+
+  const { data } = supabase.storage.from("recipe-images").getPublicUrl(fileName);
+  return data.publicUrl;
+}
 
 export async function createRecipe(formData: FormData) {
   const supabase = await createClient();
@@ -22,6 +41,13 @@ export async function createRecipe(formData: FormData) {
   const prepTime = formData.get("prep_time_minutes") as string;
   const cookTime = formData.get("cook_time_minutes") as string;
   const servings = formData.get("servings") as string;
+
+  // Handle image upload
+  const imageFile = formData.get("image") as File | null;
+  let imageUrl: string | null = null;
+  if (imageFile && imageFile.size > 0) {
+    imageUrl = await uploadRecipeImage(supabase, user.id, imageFile);
+  }
 
   // Parse ingredients from JSON string
   const ingredientsRaw = formData.get("ingredients") as string;
@@ -61,6 +87,7 @@ export async function createRecipe(formData: FormData) {
     health_score: healthScore ? parseFloat(healthScore) : null,
     taste_score: tasteScore ? parseFloat(tasteScore) : null,
     cost_score: costScore ? parseFloat(costScore) : null,
+    image_url: imageUrl,
     created_by: user.id,
   });
 
@@ -118,6 +145,17 @@ export async function updateRecipe(formData: FormData) {
   const cookTime = formData.get("cook_time_minutes") as string;
   const servings = formData.get("servings") as string;
 
+  // Handle image upload
+  const imageFile = formData.get("image") as File | null;
+  const removeImage = formData.get("remove_image") === "true";
+  let imageUrl: string | null | undefined = undefined; // undefined = don't change
+  if (removeImage) {
+    imageUrl = null; // clear the image
+  } else if (imageFile && imageFile.size > 0) {
+    const url = await uploadRecipeImage(supabase, user.id, imageFile);
+    if (url) imageUrl = url;
+  }
+
   const ingredientsRaw = formData.get("ingredients") as string;
   let ingredients = [];
   try {
@@ -155,6 +193,7 @@ export async function updateRecipe(formData: FormData) {
       health_score: healthScore ? parseFloat(healthScore) : null,
       taste_score: tasteScore ? parseFloat(tasteScore) : null,
       cost_score: costScore ? parseFloat(costScore) : null,
+      ...(imageUrl !== undefined ? { image_url: imageUrl } : {}),
     })
     .eq("id", recipeId);
 
