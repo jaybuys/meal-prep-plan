@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { logout } from "@/app/(auth)/actions";
-import { ChevronDown, Heart, LogOut, Settings, Shield, User } from "lucide-react";
+import { CalendarDays, ChevronDown, Heart, LogOut, Settings, Shield, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,6 +47,13 @@ export default function ProfileDropdown({
         >
           <Heart className="mr-2 h-4 w-4" />
           Favorites
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => router.push("/dashboard/meal-plans")}
+        >
+          <CalendarDays className="mr-2 h-4 w-4" />
+          My Meal Plans
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"

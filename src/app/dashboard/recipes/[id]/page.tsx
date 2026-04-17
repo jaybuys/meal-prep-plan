@@ -102,6 +102,16 @@ export default async function RecipeDetailPage({
       )}
 
       <div className="space-y-6">
+        {recipe.image_url && (
+          <div className="overflow-hidden rounded-lg">
+            <img
+              src={recipe.image_url}
+              alt={recipe.name}
+              className="h-64 w-full object-cover sm:h-80"
+            />
+          </div>
+        )}
+
         <div>
           <h1 className="text-3xl font-bold">{recipe.name}</h1>
           {recipe.description && (

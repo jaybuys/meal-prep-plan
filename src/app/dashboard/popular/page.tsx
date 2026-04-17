@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Recipe } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
+import { RecipeImage } from "@/components/recipe-image";
 import {
   Card,
   CardContent,
@@ -73,7 +74,8 @@ export default async function PopularPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe, index) => (
             <Link key={recipe.id} href={`/dashboard/recipes/${recipe.id}`}>
-              <Card className="flex h-full flex-col transition-colors hover:bg-muted/50">
+              <Card className="flex h-full flex-col overflow-hidden transition-colors hover:bg-muted/50">
+                <RecipeImage src={recipe.image_url} alt={recipe.name} />
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">

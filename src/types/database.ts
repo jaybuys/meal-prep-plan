@@ -114,3 +114,51 @@ export interface Favorite {
   recipe_id: string;
   created_at: string;
 }
+
+// ============================================================
+// Meal Plan types
+// ============================================================
+
+export const DAYS_OF_WEEK = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
+
+export const MEAL_TYPES = ["breakfast", "lunch", "dinner"] as const;
+export type MealType = (typeof MEAL_TYPES)[number];
+
+export interface MealPlan {
+  id: string;
+  user_id: string;
+  week_start: string; // date string (YYYY-MM-DD)
+  name: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type MealPlanInsert = Pick<MealPlan, "user_id" | "week_start"> &
+  Partial<Pick<MealPlan, "name">>;
+
+export interface MealPlanEntry {
+  id: string;
+  meal_plan_id: string;
+  day_of_week: number; // 0=Mon … 6=Sun
+  meal_type: MealType;
+  recipe_id: string;
+  created_at: string;
+}
+
+export type MealPlanEntryInsert = Pick<
+  MealPlanEntry,
+  "meal_plan_id" | "day_of_week" | "meal_type" | "recipe_id"
+>;
+
+// Joined entry with recipe data for display
+export type MealPlanEntryWithRecipe = MealPlanEntry & {
+  recipe: Pick<Recipe, "id" | "name" | "cuisine_type" | "prep_time_minutes" | "cook_time_minutes">;
+};

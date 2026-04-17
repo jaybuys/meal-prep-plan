@@ -17,8 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { X } from "lucide-react";
 
 export default function EditRecipeForm({ recipe }: { recipe: Recipe }) {
+  const [removeImage, setRemoveImage] = useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>(
     recipe.ingredients.length > 0
       ? recipe.ingredients
@@ -128,6 +130,50 @@ export default function EditRecipeForm({ recipe }: { recipe: Recipe }) {
                 defaultValue={recipe.servings ?? ""}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image">Recipe Image (optional)</Label>
+            <input type="hidden" name="remove_image" value={removeImage ? "true" : "false"} />
+            {recipe.image_url && !removeImage ? (
+              <div className="relative w-fit">
+                <img
+                  src={recipe.image_url}
+                  alt={recipe.name}
+                  className="h-32 w-48 rounded-md object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setRemoveImage(true)}
+                  className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 text-white shadow-sm hover:bg-destructive/90"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Upload a new image below to replace, or click × to remove
+                </p>
+              </div>
+            ) : removeImage ? (
+              <p className="text-xs text-muted-foreground">
+                Image will be removed on save.{" "}
+                <button
+                  type="button"
+                  onClick={() => setRemoveImage(false)}
+                  className="text-primary underline"
+                >
+                  Undo
+                </button>
+              </p>
+            ) : null}
+            <Input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+            />
+            <p className="text-xs text-muted-foreground">
+              Upload a photo of this recipe (JPG, PNG, WebP)
+            </p>
           </div>
         </CardContent>
       </Card>

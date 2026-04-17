@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Recipe, Profile } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
+import { RecipeImage } from "@/components/recipe-image";
 import {
   Card,
   CardContent,
@@ -12,9 +13,17 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 
-const RANGE = 1; // ±1 point tolerance
-
 type ScoredRecipe = Recipe & { matchScore: number };
+
+// Per-score range rules:
+// lower = how far below the preference a recipe score can be
+// upper = how far above the preference (null = no upper limit)
+const SCORE_RANGES: Record<string, { lower: number; upper: number | null }> = {
+  ease:   { lower: 1, upper: null }, // ease: somewhat below OK, anything above is fine
+  health: { lower: 0, upper: null }, // health: has to be at least as good as preference, anything above is fine
+  taste:  { lower: 0, upper: null }, // taste: has to be at least as good as preference, anything above is fine
+  cost:   { lower: 0.5, upper: null }, // affordability: slightly below OK, anything above is fine
+};
 
 function computeMatchScore(
   recipe: Recipe,
@@ -26,27 +35,30 @@ function computeMatchScore(
   }
 ): number | null {
   // For each preference that's set AND the recipe has a score,
-  // check if the recipe falls within range. If any score is out of
-  // range, return null (filtered out). Otherwise return the sum of
-  // absolute differences (lower = better match).
+  // check if the recipe falls within its specific range. If any
+  // score is out of range, return null (filtered out). Otherwise
+  // return the sum of absolute differences (lower = better match).
   let totalDiff = 0;
   let matched = 0;
 
-  const pairs: [number | null, number | null][] = [
-    [prefs.ease, recipe.ease_score],
-    [prefs.health, recipe.health_score],
-    [prefs.taste, recipe.taste_score],
-    [prefs.cost, recipe.cost_score],
+  const checks: { key: string; pref: number | null; score: number | null }[] = [
+    { key: "ease",   pref: prefs.ease,   score: recipe.ease_score },
+    { key: "health", pref: prefs.health, score: recipe.health_score },
+    { key: "taste",  pref: prefs.taste,  score: recipe.taste_score },
+    { key: "cost",   pref: prefs.cost,   score: recipe.cost_score },
   ];
 
-  for (const [pref, score] of pairs) {
+  for (const { key, pref, score } of checks) {
     if (pref == null) continue; // user hasn't set this preference — skip
     if (score == null) continue; // recipe doesn't have this score — skip
 
-    const diff = Math.abs(pref - score);
-    if (diff > RANGE) return null; // out of range — exclude
+    const range = SCORE_RANGES[key];
+    const min = pref - range.lower;
+    const max = range.upper != null ? pref + range.upper : 5;
 
-    totalDiff += diff;
+    if (score < min || score > max) return null; // out of range — exclude
+
+    totalDiff += Math.abs(pref - score);
     matched++;
   }
 
@@ -114,7 +126,7 @@ export default async function RecommendationsPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Recommendations</h1>
         <p className="text-muted-foreground">
-          Recipes matched to your score preferences (±{RANGE} point tolerance)
+          Recipes matched to your score preferences
         </p>
       </div>
 
@@ -177,7 +189,8 @@ export default async function RecommendationsPage() {
                 key={recipe.id}
                 href={`/dashboard/recipes/${recipe.id}`}
               >
-                <Card className="flex h-full flex-col transition-colors hover:bg-muted/50">
+                <Card className="flex h-full flex-col overflow-hidden transition-colors hover:bg-muted/50">
+                  <RecipeImage src={recipe.image_url} alt={recipe.name} />
                   <CardHeader>
                     <CardTitle className="line-clamp-1">
                       {recipe.name}

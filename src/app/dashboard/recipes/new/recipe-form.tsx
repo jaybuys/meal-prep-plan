@@ -120,6 +120,19 @@ export default function RecipeForm() {
               />
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="image">Recipe Image (optional)</Label>
+            <Input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+            />
+            <p className="text-xs text-muted-foreground">
+              Upload a photo of this recipe (JPG, PNG, WebP)
+            </p>
+          </div>
         </CardContent>
       </Card>
 

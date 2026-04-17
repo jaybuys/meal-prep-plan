@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Recipe } from "@/types/database";
 import { Badge } from "@/components/ui/badge";
+import { RecipeImage } from "@/components/recipe-image";
 import {
   Card,
   CardContent,
@@ -70,7 +71,8 @@ export default async function FavoritesPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => (
             <Link key={recipe.id} href={`/dashboard/recipes/${recipe.id}`}>
-              <Card className="flex h-full flex-col transition-colors hover:bg-muted/50">
+              <Card className="flex h-full flex-col overflow-hidden transition-colors hover:bg-muted/50">
+                <RecipeImage src={recipe.image_url} alt={recipe.name} />
                 <CardHeader>
                   <CardTitle className="line-clamp-1">{recipe.name}</CardTitle>
                   {recipe.description && (
