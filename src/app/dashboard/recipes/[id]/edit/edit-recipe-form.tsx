@@ -17,9 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { AutocompleteInput } from "@/components/autocomplete-input";
 import { X } from "lucide-react";
 
-export default function EditRecipeForm({ recipe }: { recipe: Recipe }) {
+export default function EditRecipeForm({ recipe, ingredientSuggestions = [] }: { recipe: Recipe; ingredientSuggestions?: string[] }) {
   const [removeImage, setRemoveImage] = useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>(
     recipe.ingredients.length > 0
@@ -192,10 +193,11 @@ export default function EditRecipeForm({ recipe }: { recipe: Recipe }) {
                 {i === 0 && (
                   <Label className="text-xs text-muted-foreground">Name</Label>
                 )}
-                <Input
+                <AutocompleteInput
                   placeholder="e.g. Chicken breast"
                   value={ing.name}
-                  onChange={(e) => updateIngredient(i, "name", e.target.value)}
+                  onChange={(val) => updateIngredient(i, "name", val)}
+                  suggestions={ingredientSuggestions}
                 />
               </div>
               <div className="w-20 space-y-1">

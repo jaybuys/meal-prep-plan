@@ -35,6 +35,10 @@ export default async function EditRecipePage({
 
   const recipe = data as Recipe;
 
+  // Fetch distinct ingredient names for autocomplete
+  const { data: ingredientRows } = await supabase.rpc("get_distinct_ingredient_names");
+  const ingredientNames = (ingredientRows ?? []).map((r: { name: string }) => r.name);
+
   // Permission check: must be creator or admin
   const { data: profile } = await supabase
     .from("profiles")
@@ -67,7 +71,7 @@ export default async function EditRecipePage({
         </div>
       )}
 
-      <EditRecipeForm recipe={recipe} />
+      <EditRecipeForm recipe={recipe} ingredientSuggestions={ingredientNames} />
     </div>
   );
 }

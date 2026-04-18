@@ -17,8 +17,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { AutocompleteInput } from "@/components/autocomplete-input";
 
-export default function RecipeForm() {
+export default function RecipeForm({ ingredientSuggestions = [] }: { ingredientSuggestions?: string[] }) {
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { name: "", quantity: "", unit: "" },
   ]);
@@ -148,10 +149,11 @@ export default function RecipeForm() {
                 {i === 0 && (
                   <Label className="text-xs text-muted-foreground">Name</Label>
                 )}
-                <Input
+                <AutocompleteInput
                   placeholder="e.g. Chicken breast"
                   value={ing.name}
-                  onChange={(e) => updateIngredient(i, "name", e.target.value)}
+                  onChange={(val) => updateIngredient(i, "name", val)}
+                  suggestions={ingredientSuggestions}
                 />
               </div>
               <div className="w-20 space-y-1">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 import RecipeForm from "./recipe-form";
 
 export default async function NewRecipePage({
@@ -7,6 +8,10 @@ export default async function NewRecipePage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+
+  const supabase = await createClient();
+  const { data: ingredientRows } = await supabase.rpc("get_distinct_ingredient_names");
+  const ingredientNames = (ingredientRows ?? []).map((r: { name: string }) => r.name);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -26,7 +31,7 @@ export default async function NewRecipePage({
         </div>
       )}
 
-      <RecipeForm />
+      <RecipeForm ingredientSuggestions={ingredientNames} />
     </div>
   );
 }
