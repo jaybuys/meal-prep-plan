@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { AddIngredientButton, AddAllToShoppingListButton } from "./add-to-shopping-list-buttons";
 
 interface CombinedIngredient {
   name: string;
@@ -279,7 +280,7 @@ export default async function ShoppingListPage({
               const qty = formatQuantity(item);
               const unit = pluralizeUnit(item.unit, item.totalQuantity);
               return (
-                <li key={i} className="flex items-start gap-3 text-sm">
+                <li key={i} className="flex items-center gap-3 text-sm">
                   <span className="mt-0.5 h-4 w-4 shrink-0 rounded border border-muted-foreground/30" />
                   <div className="flex-1">
                     <span className="font-medium">
@@ -291,10 +292,30 @@ export default async function ShoppingListPage({
                       ({item.sources.join(", ")})
                     </span>
                   </div>
+                  <AddIngredientButton
+                    ingredient={{
+                      name: item.name,
+                      quantity: qty || null,
+                      unit: unit || null,
+                    }}
+                  />
                 </li>
               );
             })}
           </ul>
+          <div className="mt-4">
+            <AddAllToShoppingListButton
+              ingredients={combined.map((item) => {
+                const qty = formatQuantity(item);
+                const unit = pluralizeUnit(item.unit, item.totalQuantity);
+                return {
+                  name: item.name,
+                  quantity: qty || null,
+                  unit: unit || null,
+                };
+              })}
+            />
+          </div>
         </CardContent>
       </Card>
 
