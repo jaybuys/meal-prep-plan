@@ -159,6 +159,24 @@ export type MealPlanEntryInsert = Pick<
   "meal_plan_id" | "day_of_week" | "meal_type" | "recipe_id"
 >;
 
+// ============================================================
+// Shopping List types
+// ============================================================
+
+export interface ShoppingListItem {
+  id: string;
+  user_id: string;
+  name: string;
+  quantity: string | null;
+  checked: boolean;
+  position: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ShoppingListItemInsert = Pick<ShoppingListItem, "user_id" | "name"> &
+  Partial<Pick<ShoppingListItem, "quantity" | "checked" | "position">>;
+
 // Joined entry with recipe data for display
 export type MealPlanEntryWithRecipe = MealPlanEntry & {
   recipe: Pick<Recipe, "id" | "name" | "cuisine_type" | "prep_time_minutes" | "cook_time_minutes">;

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { logout } from "@/app/(auth)/actions";
-import { CalendarDays, ChevronDown, Heart, LogOut, Settings, Shield, User } from "lucide-react";
+import { CalendarDays, ChevronDown, Heart, LogOut, Settings, Shield, ShoppingCart, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +54,13 @@ export default function ProfileDropdown({
         >
           <CalendarDays className="mr-2 h-4 w-4" />
           My Meal Plans
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={() => router.push("/dashboard/shopping-list")}
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          My Shopping List
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
