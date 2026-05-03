@@ -120,6 +120,16 @@ export default function RecipeForm({ ingredientSuggestions = [] }: { ingredientS
                 placeholder="4"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="calories">Calories</Label>
+              <Input
+                id="calories"
+                name="calories"
+                type="number"
+                min={0}
+                placeholder="450"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

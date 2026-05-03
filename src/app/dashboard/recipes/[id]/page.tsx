@@ -155,6 +155,14 @@ export default async function RecipeDetailPage({
               servings
             </div>
           )}
+          {recipe.calories != null && (
+            <div>
+              <span className="font-medium text-foreground">
+                {recipe.calories}
+              </span>{" "}
+              cal
+            </div>
+          )}
         </div>
 
         {(recipe.ease_score || recipe.health_score || recipe.taste_score || recipe.cost_score) && (

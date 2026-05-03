@@ -121,6 +121,9 @@ export default async function PopularPage() {
                     {recipe.servings && (
                       <span>Serves: {recipe.servings}</span>
                     )}
+                    {recipe.calories && (
+                      <span>{recipe.calories} cal</span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

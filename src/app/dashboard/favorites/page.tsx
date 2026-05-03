@@ -128,6 +128,9 @@ export default async function FavoritesPage() {
                     {recipe.servings && (
                       <span>Serves: {recipe.servings}</span>
                     )}
+                    {recipe.calories && (
+                      <span>{recipe.calories} cal</span>
+                    )}
                   </div>
                 </CardContent>
               </Card>

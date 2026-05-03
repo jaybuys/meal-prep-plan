@@ -255,6 +255,9 @@ export default async function RecommendationsPage() {
                         {recipe.servings && (
                           <span>Serves: {recipe.servings}</span>
                         )}
+                        {recipe.calories && (
+                          <span>{recipe.calories} cal</span>
+                        )}
                       </div>
                       <span className="rounded bg-muted px-1.5 py-0.5 font-medium">
                         {recipe.matchScore === 0

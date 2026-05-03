@@ -19,6 +19,7 @@ export interface Recipe {
   prep_time_minutes: number | null;
   cook_time_minutes: number | null;
   servings: number | null;
+  calories: number | null;
   image_url: string | null;
   ease_score: number | null;
   health_score: number | null;

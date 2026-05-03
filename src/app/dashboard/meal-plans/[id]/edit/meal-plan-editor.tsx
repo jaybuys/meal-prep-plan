@@ -24,7 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Heart, X, GripVertical, Search, Trash2 } from "lucide-react";
+import { Heart, X, GripVertical, Search, Trash2, Sparkles } from "lucide-react";
 
 type RecipeSummary = Pick<
   Recipe,
@@ -43,15 +43,18 @@ interface MealPlanEditorProps {
   entries: MealPlanEntry[];
   recipes: RecipeSummary[];
   favoriteIds: string[];
+  recommendedIds: string[];
 }
 
 // ----- Draggable recipe card (in the recipe list) -----
 function DraggableRecipe({
   recipe,
   isFavorite,
+  isRecommended,
 }: {
   recipe: RecipeSummary;
   isFavorite: boolean;
+  isRecommended: boolean;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `recipe-${recipe.id}`,
@@ -63,12 +66,17 @@ function DraggableRecipe({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className={`flex cursor-grab items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm transition-colors hover:bg-muted/50 active:cursor-grabbing ${
+      className={`flex cursor-grab items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors active:cursor-grabbing ${
         isDragging ? "opacity-30" : ""
+      } ${
+        isRecommended
+          ? "border-green-200 bg-green-50 hover:bg-green-100/70 dark:border-green-800 dark:bg-green-950/30 dark:hover:bg-green-950/50"
+          : "bg-background hover:bg-muted/50"
       }`}
     >
       <GripVertical className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       {isFavorite && <Heart className="h-3.5 w-3.5 shrink-0 fill-red-500 text-red-500" />}
+      {isRecommended && <Sparkles className="h-3.5 w-3.5 shrink-0 text-green-600 dark:text-green-400" />}
       <span className="truncate font-medium">{recipe.name}</span>
       <Badge variant="outline" className="ml-auto shrink-0 text-xs">
         {recipe.cuisine_type}
@@ -136,8 +144,10 @@ export default function MealPlanEditor({
   entries,
   recipes,
   favoriteIds,
+  recommendedIds,
 }: MealPlanEditorProps) {
   const favoriteSet = new Set(favoriteIds);
+  const recommendedSet = new Set(recommendedIds);
 
   // Build initial slot map from entries
   const initialSlots: Record<SlotKey, string> = {};
@@ -324,6 +334,7 @@ export default function MealPlanEditor({
                     key={recipe.id}
                     recipe={recipe}
                     isFavorite={favoriteSet.has(recipe.id)}
+                    isRecommended={recommendedSet.has(recipe.id)}
                   />
                 ))
               )}

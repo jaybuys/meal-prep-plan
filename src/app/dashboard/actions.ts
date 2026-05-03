@@ -41,6 +41,7 @@ export async function createRecipe(formData: FormData) {
   const prepTime = formData.get("prep_time_minutes") as string;
   const cookTime = formData.get("cook_time_minutes") as string;
   const servings = formData.get("servings") as string;
+  const calories = formData.get("calories") as string;
 
   // Handle image upload
   const imageFile = formData.get("image") as File | null;
@@ -83,6 +84,7 @@ export async function createRecipe(formData: FormData) {
     prep_time_minutes: prepTime ? parseInt(prepTime) : null,
     cook_time_minutes: cookTime ? parseInt(cookTime) : null,
     servings: servings ? parseInt(servings) : null,
+    calories: calories ? parseInt(calories) : null,
     ease_score: easeScore ? parseFloat(easeScore) : null,
     health_score: healthScore ? parseFloat(healthScore) : null,
     taste_score: tasteScore ? parseFloat(tasteScore) : null,
@@ -144,6 +146,7 @@ export async function updateRecipe(formData: FormData) {
   const prepTime = formData.get("prep_time_minutes") as string;
   const cookTime = formData.get("cook_time_minutes") as string;
   const servings = formData.get("servings") as string;
+  const calories = formData.get("calories") as string;
 
   // Handle image upload
   const imageFile = formData.get("image") as File | null;
@@ -189,6 +192,7 @@ export async function updateRecipe(formData: FormData) {
       prep_time_minutes: prepTime ? parseInt(prepTime) : null,
       cook_time_minutes: cookTime ? parseInt(cookTime) : null,
       servings: servings ? parseInt(servings) : null,
+      calories: calories ? parseInt(calories) : null,
       ease_score: easeScore ? parseFloat(easeScore) : null,
       health_score: healthScore ? parseFloat(healthScore) : null,
       taste_score: tasteScore ? parseFloat(tasteScore) : null,

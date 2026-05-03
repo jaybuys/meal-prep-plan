@@ -131,6 +131,16 @@ export default function EditRecipeForm({ recipe, ingredientSuggestions = [] }: {
                 defaultValue={recipe.servings ?? ""}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="calories">Calories</Label>
+              <Input
+                id="calories"
+                name="calories"
+                type="number"
+                min={0}
+                defaultValue={recipe.calories ?? ""}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
