@@ -56,6 +56,46 @@ export async function addShoppingListItem(formData: FormData) {
   revalidatePath("/dashboard/shopping-list");
 }
 
+export async function addIngredientsToShoppingList(
+  ingredients: { name: string; quantity: string | number | null; unit?: string }[]
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect("/login");
+
+  if (ingredients.length === 0) return;
+
+  // Get the highest position
+  const { data: last } = await supabase
+    .from("shopping_list_items")
+    .select("position")
+    .eq("user_id", user.id)
+    .order("position", { ascending: false })
+    .limit(1)
+    .single();
+
+  const startPosition = (last?.position ?? -1) + 1;
+
+  const rows = ingredients.map((ing, i) => {
+    const parts: string[] = [];
+    if (ing.quantity) parts.push(String(ing.quantity));
+    if (ing.unit) parts.push(ing.unit);
+    const qty = parts.length > 0 ? parts.join(" ") : null;
+    return {
+      user_id: user.id,
+      name: ing.name.trim(),
+      quantity: qty,
+      position: startPosition + i,
+    };
+  });
+
+  await supabase.from("shopping_list_items").insert(rows);
+  revalidatePath("/dashboard/shopping-list");
+}
+
 export async function updateShoppingListItem(formData: FormData) {
   const supabase = await createClient();
   const {

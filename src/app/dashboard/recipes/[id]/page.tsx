@@ -12,6 +12,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { buttonVariants } from "@/components/ui/button";
 import FavoriteButton from "./favorite-button";
+import { AddIngredientButton, AddAllIngredientsButton } from "./add-to-shopping-list";
 
 export default async function RecipeDetailPage({
   params,
@@ -208,9 +209,9 @@ export default async function RecipeDetailPage({
               <h2 className="mb-3 text-xl font-semibold">Ingredients</h2>
               <ul className="space-y-1.5">
                 {recipe.ingredients.map((ing, i) => (
-                  <li key={i} className="flex items-baseline gap-2">
+                  <li key={i} className="flex items-center gap-2">
                     <span className="text-muted-foreground">•</span>
-                    <span>
+                    <span className="flex-1">
                       {ing.quantity && (
                         <span className="font-medium">{ing.quantity}</span>
                       )}{" "}
@@ -221,9 +222,13 @@ export default async function RecipeDetailPage({
                       )}{" "}
                       {ing.name}
                     </span>
+                    <AddIngredientButton ingredient={ing} />
                   </li>
                 ))}
               </ul>
+              <div className="mt-4">
+                <AddAllIngredientsButton ingredients={recipe.ingredients} />
+              </div>
             </div>
           </>
         )}
