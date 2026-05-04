@@ -2,17 +2,26 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+
+
+function getBaseUrl() {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+}
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin") || "";
+  const baseUrl = getBaseUrl();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/api/auth/callback`,
+      redirectTo: `${baseUrl}/api/auth/callback`,
     },
   });
 
@@ -40,8 +49,7 @@ export async function login(formData: FormData) {
 
 export async function register(formData: FormData) {
   const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin") || "";
+  const baseUrl = getBaseUrl();
 
   const displayName = formData.get("display_name") as string;
 
@@ -49,7 +57,7 @@ export async function register(formData: FormData) {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
     options: {
-      emailRedirectTo: `${origin}/api/auth/callback`,
+      emailRedirectTo: `${baseUrl}/api/auth/callback`,
       data: {
         display_name: displayName,
       },
@@ -65,13 +73,12 @@ export async function register(formData: FormData) {
 
 export async function forgotPassword(formData: FormData) {
   const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin") || "";
+  const baseUrl = getBaseUrl();
 
   const { error } = await supabase.auth.resetPasswordForEmail(
     formData.get("email") as string,
     {
-      redirectTo: `${origin}/api/auth/callback?next=/reset-password`,
+      redirectTo: `${baseUrl}/api/auth/callback?next=/reset-password`,
     }
   );
 
