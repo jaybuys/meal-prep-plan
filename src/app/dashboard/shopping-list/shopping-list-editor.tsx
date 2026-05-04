@@ -32,9 +32,10 @@ import {
 
 interface ShoppingListEditorProps {
   initialItems: ShoppingListItem[];
+  listOwnerId: string;
 }
 
-export default function ShoppingListEditor({ initialItems }: ShoppingListEditorProps) {
+export default function ShoppingListEditor({ initialItems, listOwnerId }: ShoppingListEditorProps) {
   const [items, setItems] = useState<ShoppingListItem[]>(initialItems);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -48,6 +49,7 @@ export default function ShoppingListEditor({ initialItems }: ShoppingListEditorP
   const checkedItems = items.filter((i) => i.checked);
 
   function handleAdd(formData: FormData) {
+    formData.set("list_owner_id", listOwnerId);
     startTransition(async () => {
       await addShoppingListItem(formData);
       // Optimistically update — refetch will come from revalidation
@@ -125,14 +127,14 @@ export default function ShoppingListEditor({ initialItems }: ShoppingListEditorP
   function handleClearChecked() {
     setItems((prev) => prev.filter((i) => !i.checked));
     startTransition(async () => {
-      await clearCheckedItems();
+      await clearCheckedItems(listOwnerId);
     });
   }
 
   function handleClearAll() {
     setItems([]);
     startTransition(async () => {
-      await clearAllItems();
+      await clearAllItems(listOwnerId);
     });
   }
 
