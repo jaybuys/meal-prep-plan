@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { AutocompleteInput } from "@/components/autocomplete-input";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 export default function EditRecipeForm({ recipe, ingredientSuggestions = [] }: { recipe: Recipe; ingredientSuggestions?: string[] }) {
   const [removeImage, setRemoveImage] = useState(false);
@@ -148,9 +149,11 @@ export default function EditRecipeForm({ recipe, ingredientSuggestions = [] }: {
             <input type="hidden" name="remove_image" value={removeImage ? "true" : "false"} />
             {recipe.image_url && !removeImage ? (
               <div className="relative w-fit">
-                <img
+                <Image
                   src={recipe.image_url}
                   alt={recipe.name}
+                  width={192}
+                  height={128}
                   className="h-32 w-48 rounded-md object-cover"
                 />
                 <button

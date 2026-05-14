@@ -1,4 +1,5 @@
 import { UtensilsCrossed } from "lucide-react";
+import Image from "next/image";
 
 export function RecipeImage({
   src,
@@ -11,11 +12,13 @@ export function RecipeImage({
 }) {
   if (src) {
     return (
-      <div className={`w-full overflow-hidden ${className}`}>
-        <img
+      <div className={`relative w-full overflow-hidden ${className}`}>
+        <Image
           src={src}
           alt={alt}
-          className="h-full w-full object-cover"
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover"
         />
       </div>
     );

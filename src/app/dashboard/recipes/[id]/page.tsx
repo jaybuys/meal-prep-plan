@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import type { Recipe } from "@/types/database";
@@ -105,11 +106,16 @@ export default async function RecipeDetailPage({
       <div className="space-y-6">
         {recipe.image_url && (
           <div className="overflow-hidden rounded-lg">
-            <img
-              src={recipe.image_url}
-              alt={recipe.name}
-              className="h-64 w-full object-cover sm:h-80"
-            />
+            <div className="relative h-64 w-full sm:h-80">
+              <Image
+                src={recipe.image_url}
+                alt={recipe.name}
+                fill
+                sizes="(min-width: 640px) 672px, 100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         )}
 
