@@ -123,13 +123,17 @@ export async function createUser(formData: FormData) {
 
 export async function deleteUser(formData: FormData) {
   const userId = formData.get("user_id") as string;
+  const { supabase, user } = await verifyAdmin();
+
+  // Prevent admins from deleting their own profile
+  if (userId === user.id) {
+    return redirect("/admin/users?error=" + encodeURIComponent("You cannot delete your own account"));
+  }
 
   // Deleting from auth.users requires the service_role key,
   // which we don't have on the client-side Supabase instance.
   // For now, we just remove the profile (auth user remains but is orphaned).
   // A proper implementation would use a Supabase Edge Function or admin API.
-  const { supabase } = await verifyAdmin();
-
   const { error } = await supabase
     .from("profiles")
     .delete()

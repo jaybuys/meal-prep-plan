@@ -29,6 +29,10 @@ export default async function AdminUserEditPage({
   const { error, success } = await searchParams;
   const supabase = await createClient();
 
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
+
   const { data } = await supabase
     .from("profiles")
     .select("*")
@@ -160,24 +164,28 @@ export default async function AdminUserEditPage({
           </CardContent>
         </Card>
 
-        <Separator />
+        {currentUser?.id !== profile.id && (
+          <>
+            <Separator />
 
-        <Card className="border-destructive/50">
-          <CardHeader>
-            <CardTitle className="text-destructive">Danger Zone</CardTitle>
-            <CardDescription>
-              Remove this user&apos;s profile. This cannot be undone.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={deleteUser}>
-              <input type="hidden" name="user_id" value={profile.id} />
-              <Button type="submit" variant="destructive">
-                Delete user profile
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>
+                  Remove this user&apos;s profile. This cannot be undone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form action={deleteUser}>
+                  <input type="hidden" name="user_id" value={profile.id} />
+                  <Button type="submit" variant="destructive">
+                    Delete user profile
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
