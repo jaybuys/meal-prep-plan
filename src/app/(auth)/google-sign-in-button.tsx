@@ -27,12 +27,16 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-export default function GoogleSignInButton() {
+export default function GoogleSignInButton({
+  intent = "login",
+}: {
+  intent?: "login" | "register";
+}) {
   const [isPending, startTransition] = useTransition();
 
   function handleClick() {
     startTransition(async () => {
-      await signInWithGoogle();
+      await signInWithGoogle(intent);
     });
   }
 

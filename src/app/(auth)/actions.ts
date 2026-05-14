@@ -3,6 +3,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
+async function requireInviteCookie() {
+  const { cookies } = await import("next/headers");
+  const cookieStore = await cookies();
+  const ok = cookieStore.get("invite_ok")?.value === "true";
+  if (!ok) {
+    redirect(
+      "/invite?error=" +
+        encodeURIComponent("You need an invite code to create an account")
+    );
+  }
+}
+
 
 function getBaseUrl() {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
@@ -14,19 +26,20 @@ function getBaseUrl() {
   return "http://localhost:3000";
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(intent: "login" | "register" = "login") {
   const supabase = await createClient();
   const baseUrl = getBaseUrl();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${baseUrl}/api/auth/callback`,
+      redirectTo: `${baseUrl}/api/auth/callback?intent=${intent}`,
     },
   });
 
   if (error) {
-    return redirect("/login?error=" + encodeURIComponent(error.message));
+    const errorPage = intent === "register" ? "/register" : "/login";
+    return redirect(`${errorPage}?error=` + encodeURIComponent(error.message));
   }
 
   return redirect(data.url);
@@ -48,6 +61,7 @@ export async function login(formData: FormData) {
 }
 
 export async function register(formData: FormData) {
+  await requireInviteCookie();
   const supabase = await createClient();
   const baseUrl = getBaseUrl();
 
