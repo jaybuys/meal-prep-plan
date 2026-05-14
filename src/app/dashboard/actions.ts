@@ -11,13 +11,16 @@ async function uploadRecipeImage(
   file: File
 ): Promise<string | null> {
   const ext = file.name.split(".").pop() ?? "jpg";
-  const fileName = `${userId}/${Date.now()}.${ext}`;
+  const fileName = `${userId}/${crypto.randomUUID()}.${ext}`;
 
   const { error } = await supabase.storage
     .from("recipe-images")
-    .upload(fileName, file, { contentType: file.type, upsert: false });
+    .upload(fileName, file, { contentType: file.type, upsert: true });
 
-  if (error) return null;
+  if (error) {
+    console.error("uploadRecipeImage error", error);
+    return null;
+  }
 
   const { data } = supabase.storage.from("recipe-images").getPublicUrl(fileName);
   return data.publicUrl;
@@ -46,8 +49,22 @@ export async function createRecipe(formData: FormData) {
   // Handle image upload
   const imageFile = formData.get("image") as File | null;
   let imageUrl: string | null = null;
-  if (imageFile && imageFile.size > 0) {
-    imageUrl = await uploadRecipeImage(supabase, user.id, imageFile);
+  try {
+    if (imageFile && imageFile.size > 0) {
+      imageUrl = await uploadRecipeImage(supabase, user.id, imageFile);
+      if (!imageUrl) {
+        return redirect(
+          "/dashboard/recipes/new?error=" +
+            encodeURIComponent("Image upload failed. Please try again.")
+        );
+      }
+    }
+  } catch (e) {
+    console.error("createRecipe image upload exception", e);
+    return redirect(
+      "/dashboard/recipes/new?error=" +
+        encodeURIComponent("Image upload failed. Please try again.")
+    );
   }
 
   // Parse ingredients from JSON string
@@ -155,8 +172,22 @@ export async function updateRecipe(formData: FormData) {
   if (removeImage) {
     imageUrl = null; // clear the image
   } else if (imageFile && imageFile.size > 0) {
-    const url = await uploadRecipeImage(supabase, user.id, imageFile);
-    if (url) imageUrl = url;
+    try {
+      const url = await uploadRecipeImage(supabase, user.id, imageFile);
+      if (!url) {
+        return redirect(
+          `/dashboard/recipes/${recipeId}/edit?error=` +
+            encodeURIComponent("Image upload failed. Please try again.")
+        );
+      }
+      imageUrl = url;
+    } catch (e) {
+      console.error("updateRecipe image upload exception", e);
+      return redirect(
+        `/dashboard/recipes/${recipeId}/edit?error=` +
+          encodeURIComponent("Image upload failed. Please try again.")
+      );
+    }
   }
 
   const ingredientsRaw = formData.get("ingredients") as string;
